@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 __attribute__((unused)) static inline unsigned char
-flo_isAlphaBetical(unsigned char ch) {
+flo_isAlphabetical(unsigned char ch) {
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }
 
