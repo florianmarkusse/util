@@ -7,15 +7,15 @@ extern "C" {
 
 #ifdef DEBUG
 #if _MSC_VER
-#define FLO_HTML_ASSERT(c)                                                     \
+#define FLO_ASSERT(c)                                                          \
     if (!(c))                                                                  \
         __debugbreak();
 #elif __GNUC__
-#define FLO_HTML_ASSERT(c)                                                     \
+#define FLO_ASSERT(c)                                                          \
     if (!(c))                                                                  \
         __builtin_trap();
 #else
-#define FLO_HTML_ASSERT(c)                                                     \
+#define FLO_ASSERT(c)                                                          \
     if (!(c))                                                                  \
         *(volatile int *)0 = 0;
 #endif

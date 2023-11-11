@@ -12,16 +12,16 @@ extern "C" {
 
 #include "../assert.h"
 
-#define flo_EMPTY_STRING                                                       \
+#define FLO_EMPTY_STRING                                                       \
     (flo_String) { NULL, 0 }
-#define flo_STRING(s)                                                          \
+#define FLO_STRING(s)                                                          \
     (flo_String) { (unsigned char *)(s), sizeof(s) - 1 }
-#define flo_STRING_LEN(s, len)                                                 \
+#define FLO_STRING_LEN(s, len)                                                 \
     (flo_String) { (unsigned char *)(s), len }
-#define flo_STRING_PTRS(begin, end)                                            \
+#define FLO_STRING_PRINTTRS(begin, end)                                        \
     (flo_String) { (unsigned char *)(begin), ((end) - (begin)) }
 
-#define flo_STRING_PRINT(string) (int)(string).len, (string).buf
+#define FLO_STRING_PRINT(string) (int)(string).len, (string).buf
 
 typedef struct {
     unsigned char *buf;
