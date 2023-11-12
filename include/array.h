@@ -51,7 +51,7 @@ __attribute((unused)) static void flo_grow(void *slice, ptrdiff_t size,
 
 #define FLO_COPY_DYNAMIC_ARRAY(newArr, oldArr, t, a)                           \
     newArr.buf = FLO_NEW(a, t, (oldArr).len);                                  \
-    memcpy((newArr).buf, (oldArr).buf, (oldArr).len *FLO_STRINGIZEOF(t));      \
+    memcpy((newArr).buf, (oldArr).buf, (oldArr).len *FLO_SIZEOF(t));      \
     (newArr).len = (oldArr).len;                                               \
     (newArr).cap = (oldArr).len;
 
@@ -60,7 +60,7 @@ __attribute((unused)) static void flo_grow(void *slice, ptrdiff_t size,
         typeof(s) s_ = (s);                                                    \
         typeof(a) a_ = (a);                                                    \
         if (s_->len >= s_->cap) {                                              \
-            flo_grow(s_, FLO_STRINGIZEOF(*s_->buf), FLO_ALIGNOF(*s_->buf), a_, \
+            flo_grow(s_, FLO_SIZEOF(*s_->buf), FLO_ALIGNOF(*s_->buf), a_, \
                      0);                                                       \
         }                                                                      \
         s_->buf + s_->len++;                                                   \
@@ -70,7 +70,7 @@ __attribute((unused)) static void flo_grow(void *slice, ptrdiff_t size,
         typeof(s) s_ = (s);                                                    \
         typeof(a) a_ = (a);                                                    \
         if (s_->len >= s_->cap) {                                              \
-            flo_grow(s_, FLO_STRINGIZEOF(*s_->buf), FLO_ALIGNOF(*s_->buf), a_, \
+            flo_grow(s_, FLO_SIZEOF(*s_->buf), FLO_ALIGNOF(*s_->buf), a_, \
                      f);                                                       \
         }                                                                      \
         s_->buf + s_->len++;                                                   \

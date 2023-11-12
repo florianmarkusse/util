@@ -18,7 +18,7 @@ extern "C" {
     (flo_String) { (unsigned char *)(s), sizeof(s) - 1 }
 #define FLO_STRING_LEN(s, len)                                                 \
     (flo_String) { (unsigned char *)(s), len }
-#define FLO_STRING_PRINTTRS(begin, end)                                        \
+#define FLO_STRING_PTRS(begin, end)                                            \
     (flo_String) { (unsigned char *)(begin), ((end) - (begin)) }
 
 #define FLO_STRING_PRINT(string) (int)(string).len, (string).buf

@@ -17,13 +17,13 @@ flo_addRawData(flo_RawData *raw, flo_String data, flo_Arena *perm) {
         ptrdiff_t newCap = (raw->len + data.len) * 2;
         if (raw->buf == NULL) {
             raw->cap = data.len;
-            raw->buf = flo_alloc(perm, FLO_STRINGIZEOF(unsigned char),
+            raw->buf = flo_alloc(perm, FLO_SIZEOF(unsigned char),
                                  FLO_ALIGNOF(unsigned char), newCap, 0);
         } else if (perm->end == (char *)(raw->buf - raw->cap)) {
-            flo_alloc(perm, FLO_STRINGIZEOF(unsigned char),
+            flo_alloc(perm, FLO_SIZEOF(unsigned char),
                       FLO_ALIGNOF(unsigned char), newCap, 0);
         } else {
-            void *buf = flo_alloc(perm, FLO_STRINGIZEOF(unsigned char),
+            void *buf = flo_alloc(perm, FLO_SIZEOF(unsigned char),
                                   FLO_ALIGNOF(unsigned char), newCap, 0);
             memcpy(buf, raw->buf, raw->len);
             raw->buf = buf;

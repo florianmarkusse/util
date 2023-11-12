@@ -35,6 +35,7 @@ __attribute((unused, malloc, alloc_size(2, 4),
              alloc_align(3))) static inline void *
 flo_alloc(flo_Arena *a, ptrdiff_t size, ptrdiff_t align, ptrdiff_t count,
           unsigned char flags) {
+    FLO_ASSERT(size > 0);
     FLO_ASSERT(align > 0);
     FLO_ASSERT((align & (align - 1)) == 0);
 
@@ -64,12 +65,11 @@ __attribute((unused)) static void *flo_copyToArena(flo_Arena *arena, void *data,
     return copy;
 }
 
-#define FLO_NEW_2(a, t)                                                        \
-    (t *)flo_alloc(a, FLO_STRINGIZEOF(t), FLO_ALIGNOF(t), 1, 0)
+#define FLO_NEW_2(a, t) (t *)flo_alloc(a, FLO_SIZEOF(t), FLO_ALIGNOF(t), 1, 0)
 #define FLO_NEW_3(a, t, n)                                                     \
-    (t *)flo_alloc(a, FLO_STRINGIZEOF(t), FLO_ALIGNOF(t), n, 0)
+    (t *)flo_alloc(a, FLO_SIZEOF(t), FLO_ALIGNOF(t), n, 0)
 #define FLO_NEW_4(a, t, n, f)                                                  \
-    (t *)flo_alloc(a, FLO_STRINGIZEOF(t), FLO_ALIGNOF(t), n, f)
+    (t *)flo_alloc(a, FLO_SIZEOF(t), FLO_ALIGNOF(t), n, f)
 #define FLO_NEW_X(a, b, c, d, e, ...) e
 #define FLO_NEW(...)                                                           \
     FLO_NEW_X(__VA_ARGS__, FLO_NEW_4, FLO_NEW_3, FLO_NEW_2)                    \

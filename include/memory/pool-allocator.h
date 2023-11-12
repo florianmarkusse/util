@@ -50,7 +50,7 @@ flo_PoolAllocator flo_createPoolAllocator(char *buffer, ptrdiff_t cap,
 
     FLO_ASSERT(chunkSize > 0);
     FLO_ASSERT((chunkSize & (chunkSize - 1)) == 0);
-    FLO_ASSERT(chunkSize > (ptrdiff_t)sizeof(flo_PoolHead));
+    FLO_ASSERT(chunkSize > FLO_SIZEOF(flo_PoolHead));
 
     FLO_ASSERT(cap > chunkSize);
 
@@ -66,8 +66,8 @@ flo_PoolAllocator flo_createPoolAllocator(char *buffer, ptrdiff_t cap,
 
     return result;
 }
-
-void *flo_poolAlloc(flo_PoolAllocator *pool, unsigned char flags) {
+__attribute((unused, malloc)) static inline void *
+flo_poolAlloc(flo_PoolAllocator *pool, unsigned char flags) {
     flo_PoolHead *node = pool->head;
 
     if (node == NULL) {
