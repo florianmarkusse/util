@@ -3,7 +3,7 @@
 
 #include "error.h"
 #include "file/read.h"
-#include "memory.h"
+#include "memory/arena.h"
 
 flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,
                             flo_Arena *perm) {

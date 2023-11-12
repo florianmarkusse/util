@@ -8,7 +8,7 @@ extern "C" {
 #include <stddef.h>
 
 #include "file-status.h"
-#include "memory.h"
+#include "memory/arena.h"
 #include "text/string.h"
 
 flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,

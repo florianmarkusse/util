@@ -5,7 +5,7 @@
 #include "hash/hash-constants.h"
 #include "hash/hashes.h"
 #include "hash/string-hash.h"
-#include "memory.h"
+#include "memory/arena.h"
 
 #define MAX_CAPACITY ((1U << 18U) - 1)
 

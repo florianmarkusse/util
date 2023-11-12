@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include <dirent.h>
-#include <memory.h>
+#include <memory/arena.h>
 #include <stdbool.h>
 #include <stddef.h>
 

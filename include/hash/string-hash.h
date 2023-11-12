@@ -10,7 +10,7 @@ extern "C" {
 
 #include "flo/html-parser/definitions.h"
 #include "hash-comparison-status.h"
-#include "memory.h"
+#include "memory/arena.h"
 #include "text/string.h"
 
 /**

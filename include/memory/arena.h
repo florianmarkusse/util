@@ -1,18 +1,14 @@
-#ifndef MEMORY_H
-#define MEMORY_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef MEMORY_ARENA_H
+#define MEMORY_ARENA_H
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "assert.h"
 #include "error.h"
+#include "macros.h"
 
 typedef struct {
     char *beg;
@@ -21,8 +17,19 @@ typedef struct {
     void **jmp_buf;
 } flo_Arena;
 
-#define FLO_ZERO_MEMORY 0x01
-#define FLO_NULL_ON_FAIL 0x02
+/*
+ * Set up the arena values, except for the jmp_buf!
+ */
+__attribute((unused)) static inline flo_Arena flo_createArena(char *start,
+                                                              ptrdiff_t cap) {
+    flo_Arena result;
+
+    result.beg = start;
+    result.end = start + cap;
+    result.cap = cap;
+
+    return result;
+}
 
 __attribute((unused, malloc, alloc_size(2, 4),
              alloc_align(3))) static inline void *
@@ -31,23 +38,20 @@ flo_alloc(flo_Arena *a, ptrdiff_t size, ptrdiff_t align, ptrdiff_t count,
     FLO_ASSERT(align > 0);
     FLO_ASSERT((align & (align - 1)) == 0);
 
-    ptrdiff_t total = size * count;
-
-    char *newEnd = a->end;
-    newEnd -= total;
-    newEnd -= (uintptr_t)a->end & !(align - 1); // fix alignment.
-
-    if (newEnd < a->beg) {
+    ptrdiff_t avail = a->end - a->beg;
+    ptrdiff_t padding = -(uintptr_t)a->beg & (align - 1);
+    if (count > (avail - padding) / size) {
         FLO_ASSERT(false);
         if (flags & FLO_NULL_ON_FAIL) {
             return NULL;
         }
         __builtin_longjmp(a->jmp_buf, 1);
     }
+    ptrdiff_t total = size * count;
+    char *p = a->beg + padding;
+    a->beg += padding + total;
 
-    a->end = newEnd;
-
-    return flags & FLO_ZERO_MEMORY ? memset(a->end, 0, total) : a->end;
+    return flags & FLO_ZERO_MEMORY ? memset(p, 0, total) : p;
 }
 
 // TODO: Create macro?? Or devise solution to handle perm & scratch better.
@@ -60,11 +64,6 @@ __attribute((unused)) static void *flo_copyToArena(flo_Arena *arena, void *data,
     return copy;
 }
 
-#define FLO_STRINGIZEOF(x) (ptrdiff_t)sizeof(x)
-#define FLO_COUNTOF(a) (FLO_STRINGIZEOF(a) / FLO_STRINGIZEOF(*(a)))
-#define FLO_LENGTHOF(s) (FLO_COUNTOF(s) - 1)
-#define FLO_ALIGNOF(t) (_Alignof(t))
-
 #define FLO_NEW_2(a, t)                                                        \
     (t *)flo_alloc(a, FLO_STRINGIZEOF(t), FLO_ALIGNOF(t), 1, 0)
 #define FLO_NEW_3(a, t, n)                                                     \
@@ -75,9 +74,5 @@ __attribute((unused)) static void *flo_copyToArena(flo_Arena *arena, void *data,
 #define FLO_NEW(...)                                                           \
     FLO_NEW_X(__VA_ARGS__, FLO_NEW_4, FLO_NEW_3, FLO_NEW_2)                    \
     (__VA_ARGS__)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

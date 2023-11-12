@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "memory.h"
+#include "memory/arena.h"
 
 #define FLO_ARRAY(T)                                                           \
     struct {                                                                   \
@@ -26,6 +26,10 @@ typedef struct {
     ptrdiff_t cap;
 } Slice;
 
+/**
+ * Written assuming that flo_Arena bumps up! Otherwise the middle case statement
+ * where we only do a times 1 alloc does not hold.
+ */
 __attribute((unused)) static void flo_grow(void *slice, ptrdiff_t size,
                                            ptrdiff_t align, flo_Arena *a,
                                            unsigned char flags) {
@@ -34,14 +38,12 @@ __attribute((unused)) static void flo_grow(void *slice, ptrdiff_t size,
     if (replica->buf == NULL) {
         replica->cap = 1;
         replica->buf = flo_alloc(a, 2 * size, align, replica->cap, flags);
-    } else if (replica->buf == a->end) {
-        void *buf = flo_alloc(a, size, align, replica->cap, flags);
-        memcpy(buf, replica->buf, size * replica->len);
-        replica->buf = buf;
+    } else if (a->beg == replica->buf + size * replica->cap) {
+        flo_alloc(a, size, 1, replica->cap, flags);
     } else {
-        void *buf = flo_alloc(a, 2 * size, align, replica->cap, flags);
-        memcpy(buf, replica->buf, size * replica->len);
-        replica->buf = buf;
+        void *data = flo_alloc(a, 2 * size, align, replica->cap, flags);
+        memcpy(data, replica->buf, size * replica->len);
+        replica->buf = data;
     }
 
     replica->cap *= 2;

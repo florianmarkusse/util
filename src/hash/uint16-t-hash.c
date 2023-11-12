@@ -3,7 +3,7 @@
 #include "hash/hash-constants.h"
 #include "hash/hashes.h"
 #include "hash/uint16-t-hash.h"
-#include "memory.h"
+#include "memory/arena.h"
 
 #define MAX_CAPACITY ((1U << 16U) - 1) // Maximum capacity for uint16_t
 

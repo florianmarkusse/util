@@ -11,7 +11,7 @@ extern "C" {
 #include <stdlib.h>
 
 #include "array.h"
-#include "memory.h"
+#include "memory/arena.h"
 
 typedef FLO_ARRAY(uint16_t) flo_uint16_t_a;
 

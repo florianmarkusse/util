@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "memory.h"
+#include "memory/arena.h"
 #include "text/string.h"
 
 void flo_createPath(flo_String fileLocation, flo_Arena scratch);
