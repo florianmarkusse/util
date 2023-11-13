@@ -136,6 +136,10 @@ flo_BuddyAllocator flo_createBuddyAllocator(char *data, size_t size) {
     return result;
 }
 
+/**
+ * Coalescing algorithm. Think of left and right of 2 nodes of a binary tree.
+ * You can only merge nodes that are actually part of the same branch.
+ */
 void flo_coalesceBuddies(flo_BuddyBlock *head, flo_BuddyBlock *tail) {
     while (true) {
         // Keep looping until there are no more buddies to coalesce
@@ -146,23 +150,31 @@ void flo_coalesceBuddies(flo_BuddyBlock *head, flo_BuddyBlock *tail) {
         bool noCoalesce = true;
         while (block < tail &&
                buddy < tail) { // make sure the buddies are within the range
-            if (block->isFree && buddy->isFree && block->size == buddy->size) {
-                // Coalesce buddies into one
-                block->size <<= 1;
-                block = flo_nextBuddy(block);
-                if (block < tail) {
-                    buddy = flo_nextBuddy(block);
-                    noCoalesce = false;
-                }
-            } else if (block->size < buddy->size) {
-                // The buddy block is split into smaller blocks
-                block = buddy;
-                buddy = flo_nextBuddy(buddy);
-            } else {
+            if (block->size < buddy->size) {
                 block = flo_nextBuddy(buddy);
                 if (block < tail) {
                     // Leave the buddy block for the next iteration
                     buddy = flo_nextBuddy(block);
+                }
+            } else if (block->size > buddy->size) {
+                // The buddy block is split into smaller blocks
+                block = buddy;
+                buddy = flo_nextBuddy(buddy);
+            } else {
+                if (block->isFree && buddy->isFree) {
+                    // Coalesce buddies into one
+                    block->size <<= 1;
+                    block = flo_nextBuddy(block);
+                    if (block < tail) {
+                        buddy = flo_nextBuddy(block);
+                        noCoalesce = false;
+                    }
+                } else {
+                    block = flo_nextBuddy(buddy);
+                    if (block < tail) {
+                        // Leave the buddy block for the next iteration
+                        buddy = flo_nextBuddy(block);
+                    }
                 }
             }
         }
@@ -178,22 +190,21 @@ flo_buddyAlloc(flo_BuddyAllocator *buddyAllocator, ptrdiff_t size,
                ptrdiff_t count, unsigned char flags) {
     FLO_ASSERT(size > 0);
 
-    ptrdiff_t total = size * count;
+    size_t total = size * count;
+    size_t totalSize = total + FLO_SIZEOF(flo_BuddyBlock);
 
-    size_t requiredSize = FLO_ALIGNOF(flo_BuddyBlock) + total;
-
-    flo_BuddyBlock *found = flo_findBestBuddy(
-        buddyAllocator->head, buddyAllocator->tail, requiredSize);
+    flo_BuddyBlock *found = flo_findBestBuddy(buddyAllocator->head,
+                                              buddyAllocator->tail, totalSize);
     if (found == NULL) {
         // Try to coalesce all the free buddy blocks and then search again
         flo_coalesceBuddies(buddyAllocator->head, buddyAllocator->tail);
         found = flo_findBestBuddy(buddyAllocator->head, buddyAllocator->tail,
-                                  requiredSize);
+                                  totalSize);
     }
 
     if (found != NULL) {
         found->isFree = false;
-        void *result = (void *)((char *)found + FLO_ALIGNOF(flo_BuddyBlock));
+        void *result = (void *)((char *)found + FLO_SIZEOF(flo_BuddyBlock));
         if (FLO_ZERO_MEMORY & flags) {
             memset(result, 0, total);
         }
@@ -212,7 +223,7 @@ void flo_freeBuddy(flo_BuddyAllocator *buddyAllocator, void *data) {
     FLO_ASSERT(data < (void *)buddyAllocator->tail);
 
     flo_BuddyBlock *block =
-        (flo_BuddyBlock *)((char *)data - FLO_ALIGNOF(flo_BuddyBlock));
+        (flo_BuddyBlock *)((char *)data - FLO_SIZEOF(flo_BuddyBlock));
     block->isFree = true;
 
     flo_coalesceBuddies(buddyAllocator->head, buddyAllocator->tail);
