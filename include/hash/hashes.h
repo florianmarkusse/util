@@ -24,7 +24,6 @@ __attribute__((unused)) static size_t flo_hashString(flo_String string) {
 
     return hash;
 }
-// clang-format on
 
 // https://github.com/skeeto/hash-prospector
 // 3-round xorshift-multiply (-Xn3)
