@@ -6,8 +6,6 @@ extern "C" {
 #endif
 
 #include "assert.h"
-// TODO: fix this.
-#include "flo/html-parser/definitions.h"
 #include "hashes.h"
 #include "memory/arena.h"
 #include "types.h"
@@ -18,14 +16,9 @@ typedef struct {
     ptrdiff_t len;
 } flo_String_HashIndex;
 
-typedef struct {
-    flo_String_HashIndex index;
-    flo_String_d_a array;
-} flo_String_ArrayWithHashIndex;
-
 flo_String_HashIndex flo_createIndex(unsigned char exponent, flo_Arena *perm) {
     FLO_ASSERT(exponent > 0);
-    FLO_ASSERT(exponent & (exponent - 1) == 0);
+    FLO_ASSERT((exponent & (exponent - 1)) == 0);
 
     flo_String *buffer =
         FLO_NEW(perm, flo_String, 1 << exponent, FLO_ZERO_MEMORY);
@@ -66,24 +59,24 @@ __attribute((unused)) static void flo_newSet(void *setSlice, ptrdiff_t size,
     if (replica->buf == NULL) {
         replica->buf = flo_alloc(a, size, align, cap, FLO_ZERO_MEMORY);
     } else if (a->beg == replica->buf + size * cap) {
+        memset(replica->buf, 0, size * cap);
         flo_alloc(a, size, 1, cap, FLO_ZERO_MEMORY);
         replica->exp++;
+        replica->len = 0;
     } else {
         void *data = flo_alloc(a, 2 * size, align, cap, FLO_ZERO_MEMORY);
         replica->buf = data;
         replica->exp++;
+        replica->len = 0;
     }
 }
 
-bool flo_indexInsert(flo_String string, flo_String_HashIndex *index) {
-    size_t hash = flo_hashString(string);
-
+bool flo_indexInsert(flo_String string, size_t hash,
+                     flo_String_HashIndex *index) {
     for (int32_t i = (int32_t)hash;;) {
         i = flo_indexLookup(hash, index->exp, i);
-        // TODO: this fails atm on the first try because index->buf is zero
-        // initialized.
         if (index->buf[i].len == 0) {
-            if ((uint32_t)index->len + 1 == ((uint32_t)1 << index->exp) / 2) {
+            if ((uint32_t)index->len >= ((uint32_t)1 << index->exp) / 2) {
                 // Need to grow!
                 return false;
             }
@@ -96,35 +89,73 @@ bool flo_indexInsert(flo_String string, flo_String_HashIndex *index) {
     }
 }
 
-bool flo_hashTableRehash(flo_String_ArrayWithHashIndex *arrWithIndex) {
-    FLO_ASSERT(arrWithIndex->index.len == 0);
-    for (int32_t i = 0; i < arrWithIndex->array.len;) {
-        flo_String s = arrWithIndex->array.buf[i];
-        if (!flo_indexInsert(s, &arrWithIndex->index)) {
+bool flo_hashTableRehash(flo_String_d_a *backingBuffer,
+                         flo_String_HashIndex *index) {
+    FLO_ASSERT(index->len == 0);
+    for (int32_t i = 0; i < backingBuffer->len; i++) {
+        flo_String s = backingBuffer->buf[i];
+        if (!flo_indexInsert(s, flo_hashString(s), index)) {
             return false;
         }
     }
     return true;
 }
 
-bool flo_fullInsert(flo_String string,
-                    flo_String_ArrayWithHashIndex *arrWithIndex,
-                    flo_Arena *perm) {
-    if (!flo_indexInsert(string, &arrWithIndex->index)) {
-        flo_newSet(index, FLO_SIZEOF(typeof(arrWithIndex->index.buf)),
-                   FLO_ALIGNOF(typeof(arrWithIndex->index.buf)), perm);
-        if (flo_hashTableRehash(arrWithIndex) ||
-            !flo_indexInsert(string, &arrWithIndex->index)) {
-            FLO_PRINT_ERROR("Rehashing the table failed at string %.*s\n",
-                            FLO_STRING_PRINT(string));
-            __builtin_longjmp(perm->jmp_buf, 1);
+void flo_testFullInsert(flo_String string, flo_String_d_a *buffer,
+                        flo_String_HashIndex *index, flo_Arena *perm) {
+    FLO_PRINT_ERROR("at start inserting %.*s\n", FLO_STRING_PRINT(string));
+    if (!flo_indexInsert(string, flo_hashString(string), index)) {
+        FLO_PRINT_ERROR("resizing\n");
+        flo_newSet(index, FLO_SIZEOF(*index->buf), FLO_ALIGNOF(*index->buf),
+                   perm);
+        FLO_PRINT_ERROR("in here\n");
+        if (!flo_hashTableRehash(buffer, index) ||
+            !flo_indexInsert(string, flo_hashString(string), index)) {
+            FLO_PRINT_ERROR("Rehashing the table failed\n");
+            __builtin_longjmp((perm)->jmp_buf, 1);
+        }
+        FLO_PRINT_ERROR("after\n");
+    }
+
+    for (ptrdiff_t i = 0; i < (1 << index->exp); i++) {
+        if (index->buf[i].len != 0) {
+            FLO_PRINT_ERROR("INNNNInside index is: %.*s at index %td\n",
+                            FLO_STRING_PRINT(index->buf[i]), i);
+        } else {
+            FLO_PRINT_ERROR("Nothing at index %td\n", i);
         }
     }
 
-    *FLO_PUSH(&arrWithIndex->array, perm) = string;
-
-    return true;
+    FLO_PRINT_ERROR("pushing\n");
+    *FLO_PUSH(buffer, perm) = string;
 }
+
+#define FLO_REHASH(backingBuffer, index, hashFunction)                         \
+    ({                                                                         \
+        bool rehashSuccess = true;                                             \
+        FLO_ASSERT((index)->len == 0);                                         \
+        for (int32_t i = 0; i < (backingBuffer)->len; i++) {                   \
+            flo_String s = (backingBuffer)->buf[i];                            \
+            if (!flo_indexInsert(s, hashFunction(s), (index))) {               \
+                rehashSuccess = false;                                         \
+                break;                                                         \
+            }                                                                  \
+        }                                                                      \
+        rehashSuccess;                                                         \
+    })
+
+#define FLO_FULL_INSERT(string, backingBuffer, index, hashFunction, perm)      \
+    if (!flo_indexInsert(string, hashFunction(string), index)) {               \
+        flo_newSet(index, FLO_SIZEOF(*(index)->buf),                           \
+                   FLO_ALIGNOF(*(index)->buf), perm);                          \
+        if (!FLO_REHASH(backingBuffer, index, hashFunction) ||                 \
+            !flo_indexInsert(string, hashFunction(string), index)) {           \
+            FLO_PRINT_ERROR("Rehashing the table failed\n");                   \
+            __builtin_longjmp((perm)->jmp_buf, 1);                             \
+        }                                                                      \
+    }                                                                          \
+                                                                               \
+    *FLO_PUSH(backingBuffer, perm) = string;
 
 #ifdef __cplusplus
 }
