@@ -1,5 +1,5 @@
-#ifndef HASH_MSI_STRING_HASH_H
-#define HASH_MSI_STRING_HASH_H
+#ifndef HASH_MSI_STRING_SET_H
+#define HASH_MSI_STRING_SET_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,6 +12,10 @@ typedef FLO_MSI_SET(flo_String) flo_msi_String;
 
 bool flo_msi_insertString(flo_String string, size_t hash,
                           flo_msi_String *index);
+
+#define FLO_FOR_EACH_MSI_STRING(element, msiSet)                               \
+    for (ptrdiff_t _index = 0; _index < (1 << (msiSet).exp); ++_index)         \
+        if (((element) = (msiSet).buf[_index]).len != 0)
 
 // Below an example of rehashing with the old set and a growth factor of 0.5.
 //

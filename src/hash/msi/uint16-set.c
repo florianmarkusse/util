@@ -1,4 +1,4 @@
-#include "hash/msi/uint16-hash.h"
+#include "hash/msi/uint16-set.h"
 
 bool flo_msi_insertUint16(uint16_t value, size_t hash,
                           flo_msi_uint16_t *index) {

@@ -1,5 +1,5 @@
-#ifndef HASH_MSI_UINT16_HASH_H
-#define HASH_MSI_UINT16_HASH_H
+#ifndef HASH_MSI_UINT16_SET_H
+#define HASH_MSI_UINT16_SET_H
 
 #ifdef __cplusplus
 extern "C" {

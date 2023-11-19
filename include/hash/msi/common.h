@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "types.h"
+
 /**
  * Common definitions for MSI string hash.
  * https://nullprogram.com/blog/2022/08/08/
@@ -41,8 +43,6 @@ extern "C" {
  * the new set.
  */
 
-#include "types.h"
-
 #define FLO_MSI_SET(T)                                                         \
     struct {                                                                   \
         T *buf;                                                                \
@@ -50,17 +50,7 @@ extern "C" {
         ptrdiff_t len;                                                         \
     }
 
-#define FOR_EACH_MSI_ELEMENT(element, msiSet)                                  \
-    for (ptrdiff_t _index = 0; _index < (1 << (msiSet).exp); ++_index)         \
-        if (((element) = (msiSet).buf[_index]).len == 0)                       \
-            continue;                                                          \
-        else
-
-typedef struct {
-    char *buf;
-    unsigned char exp;
-    ptrdiff_t len;
-} SetSlice;
+typedef FLO_MSI_SET(char) SetSlice;
 
 #define FLO_NEW_MSI_SET(T, exponent, perm)                                     \
     ({                                                                         \
