@@ -11,7 +11,7 @@ extern "C" {
 typedef struct flo_trie_StringSet flo_trie_StringSet;
 struct flo_trie_StringSet {
     struct flo_trie_StringSet *child[4];
-    flo_String key;
+    flo_String data;
 };
 
 bool flo_trie_insertStringSet(flo_String key, flo_trie_StringSet **set,

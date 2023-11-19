@@ -36,6 +36,7 @@ flo_StringInsert flo_insertStringHashSet(flo_StringHashSet *set,
     if ((double)set->entries >= (double)set->arrayLen * FLO_GROWTH_FACTOR) {
         didResize = true;
         if ((double)set->arrayLen >= MAX_CAPACITY * 0.9) {
+            FLO_ASSERT(false);
             FLO_PRINT_ERROR(
                 "Hash set capacity would exceed the maximum capacity: %d!\n",
                 MAX_CAPACITY);

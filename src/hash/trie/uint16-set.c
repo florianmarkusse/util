@@ -4,13 +4,13 @@ bool flo_trie_insertUint16Set(uint16_t key, flo_trie_Uint16Set **set,
                               flo_Arena *perm) {
     FLO_ASSERT(key != 0);
     for (uint16_t hash = flo_hash16_xm3(key); *set != NULL; hash <<= 2) {
-        if (key == (*set)->key) {
+        if (key == (*set)->data) {
             return false;
         }
         set = &(*set)->child[hash >> 14];
     }
     *set = FLO_NEW(perm, flo_trie_Uint16Set, 1, FLO_ZERO_MEMORY);
-    (*set)->key = key;
+    (*set)->data = key;
     return true;
 }
 

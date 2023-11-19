@@ -58,7 +58,7 @@ extern "C" {
         while (it->head) {                                                     \
             int index = it->head->index++;                                     \
             if (index == 0) {                                                  \
-                return it->head->set->key;                                     \
+                return it->head->set->data;                                    \
             } else if (index == 5) {                                           \
                 /* NOLINTNEXTLINE */                                           \
                 iterNodeType *dead = it->head;                                 \

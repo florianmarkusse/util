@@ -4,13 +4,13 @@ bool flo_trie_insertStringSet(flo_String key, flo_trie_StringSet **set,
                               flo_Arena *perm) {
     FLO_ASSERT(key.len > 0);
     for (uint64_t hash = flo_hashString(key); *set != NULL; hash <<= 2) {
-        if (flo_stringEquals(key, (*set)->key)) {
+        if (flo_stringEquals(key, (*set)->data)) {
             return false;
         }
         set = &(*set)->child[hash >> 62];
     }
     *set = FLO_NEW(perm, flo_trie_StringSet, 1, FLO_ZERO_MEMORY);
-    (*set)->key = key;
+    (*set)->data = key;
     return true;
 }
 

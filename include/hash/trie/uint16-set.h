@@ -12,7 +12,7 @@ extern "C" {
 typedef struct flo_trie_Uint16Set flo_trie_Uint16Set;
 struct flo_trie_Uint16Set {
     struct flo_trie_Uint16Set *child[4];
-    uint16_t key;
+    uint16_t data;
 };
 
 bool flo_trie_insertUint16Set(uint16_t key, flo_trie_Uint16Set **set,

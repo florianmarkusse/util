@@ -33,6 +33,7 @@ bool flo_insertUint16HashSet(flo_Uint16HashSet *set, uint16_t id,
         didResize = true;
         // See if it makes sense to grow.
         if ((double)set->arrayLen >= MAX_CAPACITY * 0.9) {
+            FLO_ASSERT(false);
             FLO_PRINT_ERROR(
                 "Hash set capacity would exceed the maximum capacity "
                 "for uint16_t!\n");
