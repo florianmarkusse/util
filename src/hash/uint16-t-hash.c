@@ -84,9 +84,9 @@ bool flo_insertUint16HashSet(flo_Uint16HashSet *set, uint16_t id,
     return true;
 }
 
-flo_uint16_t_a flo_uint16HashSetToArray(flo_Uint16HashSet *set,
+flo_uint16_a flo_uint16HashSetToArray(flo_Uint16HashSet *set,
                                         flo_Arena *perm) {
-    flo_uint16_t_a result;
+    flo_uint16_a result;
     result.buf = FLO_NEW(perm, uint16_t, set->entries);
     result.len = set->entries;
 

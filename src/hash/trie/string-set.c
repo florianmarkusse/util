@@ -3,7 +3,7 @@
 bool flo_trie_insertStringSet(flo_String key, flo_trie_StringSet **set,
                               flo_Arena *perm) {
     FLO_ASSERT(key.len > 0);
-    for (uint64_t hash = flo_hashString(key); *set != NULL; hash <<= 2) {
+    for (uint64_t hash = flo_hashStringDjb2(key); *set != NULL; hash <<= 2) {
         if (flo_stringEquals(key, (*set)->data)) {
             return false;
         }

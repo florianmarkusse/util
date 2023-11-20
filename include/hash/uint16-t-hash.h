@@ -13,7 +13,7 @@ extern "C" {
 #include "array.h"
 #include "memory/arena.h"
 
-typedef FLO_ARRAY(uint16_t) flo_uint16_t_a;
+typedef FLO_ARRAY(uint16_t) flo_uint16_a;
 
 typedef struct {
     uint16_t value;
@@ -34,7 +34,7 @@ flo_Uint16HashSet flo_initUint16HashSet(uint16_t capacity, flo_Arena *perm);
 
 bool flo_insertUint16HashSet(flo_Uint16HashSet *set, uint16_t id,
                              flo_Arena *perm);
-flo_uint16_t_a flo_uint16HashSetToArray(flo_Uint16HashSet *set,
+flo_uint16_a flo_uint16HashSetToArray(flo_Uint16HashSet *set,
                                         flo_Arena *perm);
 
 bool flo_containsUint16HashSet(flo_Uint16HashSet *set, uint16_t id);

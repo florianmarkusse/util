@@ -5,7 +5,7 @@ uint16_t flo_trie_insertStringUint16Map(flo_String key, uint16_t value,
                                         flo_Arena *perm) {
     FLO_ASSERT(key.len > 0);
     FLO_ASSERT(value != 0);
-    for (uint64_t hash = flo_hashString(key); *set != NULL; hash <<= 2) {
+    for (uint64_t hash = flo_hashStringDjb2(key); *set != NULL; hash <<= 2) {
         if (flo_stringEquals(key, (*set)->data.key)) {
             return (*set)->data.value;
         }

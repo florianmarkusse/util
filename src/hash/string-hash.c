@@ -18,7 +18,7 @@ flo_StringHashSet flo_initStringHashSet(ptrdiff_t capacity, flo_Arena *perm) {
 
 flo_StringInsert flo_insertStringHashSet(flo_StringHashSet *set,
                                          flo_String string, flo_Arena *perm) {
-    size_t newStringHash = flo_hashString(string);
+    size_t newStringHash = flo_hashStringDjb2(string);
     ptrdiff_t newStringProbes = 0;
 
     while (set->array[(newStringHash + newStringProbes) % set->arrayLen]
@@ -88,7 +88,7 @@ flo_StringInsert flo_insertStringHashSet(flo_StringHashSet *set,
 }
 
 ptrdiff_t flo_containsStringHashSet(flo_StringHashSet *set, flo_String string) {
-    size_t hash = flo_hashString(string);
+    size_t hash = flo_hashStringDjb2(string);
 
     ptrdiff_t probes = 0;
     while (set->array[(hash + probes) % set->arrayLen].string.buf != NULL) {

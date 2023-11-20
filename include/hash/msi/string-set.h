@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "common.h"
+#include "hash/hash-comparison-status.h"
 #include "string.h"
 
 typedef FLO_MSI_SET(flo_String) flo_msi_String;
@@ -13,9 +14,23 @@ typedef FLO_MSI_SET(flo_String) flo_msi_String;
 bool flo_msi_insertString(flo_String string, size_t hash,
                           flo_msi_String *index);
 
+/**
+ * Assumes you know what hash function was used in this hash set. If you use the
+ * wrong hash, you get wrong answers!!!
+ */
+bool flo_msi_containsString(flo_String string, size_t hash,
+                            flo_msi_String *index);
+
+/**
+ * Uses flo_hashStringDjb2 to compare so if any of the sets used a customs
+ * hashing function, do not use!!!
+ */
+flo_HashComparisonStatus flo_msi_equalsStringSet(flo_msi_String *set1,
+                                                 flo_msi_String *set2);
+
 #define FLO_FOR_EACH_MSI_STRING(element, msiSet)                               \
-    for (ptrdiff_t _index = 0; _index < (1 << (msiSet).exp); ++_index)         \
-        if (((element) = (msiSet).buf[_index]).len != 0)
+    for (ptrdiff_t _index = 0; _index < (1 << (msiSet)->exp); ++_index)        \
+        if (((element) = (msiSet)->buf[_index]).len != 0)
 
 // Below an example of rehashing with the old set and a growth factor of 0.5.
 //
@@ -26,7 +41,7 @@ bool flo_msi_insertString(flo_String string, size_t hash,
 //     for (int32_t i = 0; i < (1 << oldIndex->exp); i++) {
 //         flo_String s = oldIndex->buf[i];
 //         if (s.len > 0) {
-//             flo_indexInsert(s, flo_hashString(s), newIndex);
+//             flo_indexInsert(s, flo_hashStringDjb2(s), newIndex);
 //         }
 //     }
 // }
@@ -41,7 +56,7 @@ bool flo_msi_insertString(flo_String string, size_t hash,
 //         rehashIndex(index, &newIndex);
 //         *index = newIndex;
 //     }
-//     return flo_indexInsert(string, flo_hashString(string), index);
+//     return flo_indexInsert(string, flo_hashStringDjb2(string), index);
 // }
 
 #ifdef __cplusplus
