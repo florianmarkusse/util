@@ -11,10 +11,20 @@ extern "C" {
 
 #include "text/string.h"
 
+__attribute__((unused)) static uint64_t
+flo_hashStringSkeeto(flo_String string) {
+    uint64_t h = 0x100;
+    for (ptrdiff_t i = 0; i < string.len; i++) {
+        h ^= string.buf[i];
+        h *= 1111111111111111111u;
+    }
+    return h;
+}
+
 // http://www.cse.yorku.ca/~oz/hash.html
 // djb2 hash
-__attribute__((unused)) static size_t flo_hashString(flo_String string) {
-    size_t hash = 5381;
+__attribute__((unused)) static uint64_t flo_hashStringDjb2(flo_String string) {
+    uint64_t hash = 5381;
     for (ptrdiff_t i = 0; i < string.len; i++) {
         int c = (string.buf[i]);
         hash =
