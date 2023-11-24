@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "text/string.h"
+
 typedef enum {
     HASH_COMPARISON_SUCCESS,
     HASH_COMPARISON_DIFFERENT_SIZES,
@@ -12,18 +14,18 @@ typedef enum {
     HASH_COMPARISON_NUM_STATUS
 } flo_HashComparisonStatus;
 
-static char *hashComparisonStatusStrings[HASH_COMPARISON_NUM_STATUS] = {
-    "Success", "Collections have different sizes",
-    "Collections have different content"};
+static flo_String hashComparisonStatusStrings[HASH_COMPARISON_NUM_STATUS] = {
+    FLO_STRING("Success"), FLO_STRING("Collections have different sizes"),
+    FLO_STRING("Collections have different content")};
 
 // Not always used, but very handy for those that actually do want readable
 // error codes.
-__attribute__((unused)) static char *
+__attribute__((unused)) static flo_String
 flo_hashComparisonStatusToString(flo_HashComparisonStatus status) {
     if (status >= 0 && status < HASH_COMPARISON_NUM_STATUS) {
         return hashComparisonStatusStrings[status];
     }
-    return "Unknown hash comparison status code!";
+    return FLO_STRING("Unknown hash comparison status code!");
 }
 
 #ifdef __cplusplus

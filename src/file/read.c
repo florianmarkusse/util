@@ -3,6 +3,7 @@
 
 #include "error.h"
 #include "file/read.h"
+#include "log.h"
 #include "memory/arena.h"
 
 flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,
@@ -11,7 +12,10 @@ flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,
     // chars.
     FILE *srcFile = fopen((char *)srcPath.buf, "rbe");
     if (srcFile == NULL) {
-        FLO_PRINT_ERROR("Failed to open source file: %s\n", srcPath.buf);
+        FLO_FLUSH_AFTER(FLO_STDERR) {
+            FLO_ERROR("Failed to open file: ");
+            FLO_ERROR(srcPath, FLO_NEWLINE);
+        }
         return FILE_CANT_OPEN;
     }
 
@@ -21,14 +25,20 @@ flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,
 
     (*buffer).buf = FLO_NEW(perm, unsigned char, dataLen, FLO_NULL_ON_FAIL);
     if ((*buffer).buf == NULL) {
-        FLO_PRINT_ERROR("Failed to allocate memory.\n");
+        FLO_FLUSH_AFTER(FLO_STDERR) {
+            FLO_ERROR((FLO_STRING("Failed to allocate memory for file ")));
+            FLO_ERROR(srcPath, FLO_NEWLINE);
+        }
         fclose(srcFile);
         return FILE_CANT_ALLOCATE;
     }
 
     ptrdiff_t result = fread((*buffer).buf, 1, dataLen, srcFile);
     if (result != dataLen) {
-        FLO_PRINT_ERROR("Failed to read the file.\n");
+        FLO_FLUSH_AFTER(FLO_STDERR) {
+            FLO_ERROR((FLO_STRING("Failed to read the file contents of ")));
+            FLO_ERROR(srcPath, FLO_NEWLINE);
+        }
         fclose(srcFile);
         return FILE_CANT_READ;
     }
