@@ -22,11 +22,11 @@ FLO_TRIE_ITERATOR_HEADER_FILE(flo_trie_Uint16Set, flo_trie_Uint16IterNode,
                               flo_trie_Uint16Iterator, uint16_t,
                               flo_createUint16Iterator, flo_nextUint16Iterator);
 
-#define FLO_FOR_EACH_TRIE_UINT16(element, intSet, perm)                        \
+#define FLO_FOR_EACH_TRIE_UINT16(element, intSet, scratch)                     \
     for (flo_trie_Uint16Iterator *iter =                                       \
-             flo_createUint16Iterator(intSet, perm);                           \
+             flo_createUint16Iterator(intSet, &(scratch));                     \
          ;)                                                                    \
-        if (((element) = flo_nextUint16Iterator(iter, perm)) == 0)             \
+        if (((element) = flo_nextUint16Iterator(iter, &(scratch))) == 0)       \
             break;                                                             \
         else
 

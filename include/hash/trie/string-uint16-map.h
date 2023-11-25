@@ -30,11 +30,12 @@ FLO_TRIE_ITERATOR_HEADER_FILE(flo_trie_StringUint16Map,
                               flo_createStringUint16Iterator,
                               flo_nextStringUint16Iterator);
 
-#define FLO_FOR_EACH_TRIE_STRING_UINT16(element, stringUint16Map, perm)        \
+#define FLO_FOR_EACH_TRIE_STRING_UINT16(element, stringUint16Map, scratch)     \
     for (flo_trie_StringUint16Iterator *iter =                                 \
-             flo_createStringUint16Iterator(stringUint16Map, perm);            \
+             flo_createStringUint16Iterator(stringUint16Map, &(scratch));      \
          ;)                                                                    \
-        if (((element) = flo_nextStringUint16Iterator(iter, perm)).value == 0) \
+        if (((element) = flo_nextStringUint16Iterator(iter, &(scratch)))       \
+                .value == 0)                                                   \
             break;                                                             \
         else
 

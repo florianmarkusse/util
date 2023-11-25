@@ -21,11 +21,11 @@ FLO_TRIE_ITERATOR_HEADER_FILE(flo_trie_StringSet, flo_trie_StringIterNode,
                               flo_trie_StringIterator, flo_String,
                               flo_createStringIterator, flo_nextStringIterator);
 
-#define FLO_FOR_EACH_TRIE_STRING(element, stringSet, perm)                     \
+#define FLO_FOR_EACH_TRIE_STRING(element, stringSet, scratch)                  \
     for (flo_trie_StringIterator *iter =                                       \
-             flo_createStringIterator(stringSet, perm);                        \
+             flo_createStringIterator(stringSet, &(scratch));                  \
          ;)                                                                    \
-        if (((element) = flo_nextStringIterator(iter, perm)).len == 0)         \
+        if (((element) = flo_nextStringIterator(iter, &(scratch))).len == 0)   \
             break;                                                             \
         else
 
