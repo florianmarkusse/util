@@ -8,6 +8,12 @@ extern "C" {
 #include "hash/hashes.h"
 #include "types.h"
 
+/**
+ * Ugly code ahead. Rewriting this iterator each time is a massive pain so I
+ * decided to write this grotesque set of macros to automatically build it for
+ * me. It looks crazy and it crazy but works surprisingly well.
+ */
+
 #define FLO_TRIE_ITER_NODE(T, iterNodeName)                                    \
     typedef struct iterNodeName iterNodeName;                                  \
     struct iterNodeName {                                                      \

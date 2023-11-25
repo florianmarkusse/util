@@ -10,7 +10,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "../assert.h"
+#include "assert.h"
 
 #define FLO_EMPTY_STRING                                                       \
     (flo_String) { NULL, 0 }
@@ -22,6 +22,17 @@ extern "C" {
     (flo_String) { (unsigned char *)(begin), ((end) - (begin)) }
 
 #define FLO_STRING_PRINT(string) (int)(string).len, (string).buf
+
+#define FLO_STRING_APPEND(string1, string2, perm)                              \
+    ({                                                                         \
+        unsigned char *appendingBuf =                                          \
+            FLO_NEW(perm, unsigned char, (string1).len + (string2).len);       \
+        memcpy(appendingBuf, (string1).buf, (string1).len);                    \
+        memcpy(appendingBuf + (string1).len, (string2).buf, (string2).len);    \
+        flo_String appendedString =                                            \
+            FLO_STRING_LEN(appendingBuf, (string1).len + (string2).len);       \
+        appendedString;                                                        \
+    })
 
 typedef struct {
     unsigned char *buf;
@@ -54,6 +65,7 @@ flo_getCharPtr(flo_String str, ptrdiff_t index) {
 
     return &str.buf[index];
 }
+
 __attribute__((unused)) static inline bool flo_containsChar(flo_String s,
                                                             unsigned char ch) {
     for (ptrdiff_t i = 0; i < s.len; i++) {

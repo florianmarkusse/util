@@ -11,8 +11,7 @@ extern "C" {
 #include "memory/arena.h"
 #include "text/string.h"
 
-flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,
-                            flo_Arena *perm);
+flo_FileStatus flo_readFile(char *srcPath, flo_String *buffer, flo_Arena *perm);
 
 #ifdef __cplusplus
 }

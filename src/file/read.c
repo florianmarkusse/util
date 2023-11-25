@@ -6,11 +6,9 @@
 #include "log.h"
 #include "memory/arena.h"
 
-flo_FileStatus flo_readFile(flo_String srcPath, flo_String *buffer,
+flo_FileStatus flo_readFile(char *srcPath, flo_String *buffer,
                             flo_Arena *perm) {
-    // casting to char* here because a srcpath should not contain any weird
-    // chars.
-    FILE *srcFile = fopen((char *)srcPath.buf, "rbe");
+    FILE *srcFile = fopen(srcPath, "rbe");
     if (srcFile == NULL) {
         FLO_FLUSH_AFTER(FLO_STDERR) {
             FLO_ERROR("Failed to open file: ");
