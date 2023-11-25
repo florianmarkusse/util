@@ -116,6 +116,27 @@ uint32_t flo_appendToBufferMinSize(flo_String data, unsigned char minSize,
     return flo_appendRepeatedCharToBuffer(' ', extraSpace, buffer, flags);
 }
 
+static flo_String flo_ansiColorToCode[FLO_COLOR_NUMS] = {
+    FLO_STRING("\x1b[31m"), FLO_STRING("\x1b[32m"), FLO_STRING("\x1b[33m"),
+    FLO_STRING("\x1b[34m"), FLO_STRING("\x1b[35m"), FLO_STRING("\x1b[36m"),
+    FLO_STRING("\x1b[0m"),
+};
+
+uint32_t flo_appendColor(flo_AnsiColor color, flo_BufferType bufferType) {
+    flo_WriteBuffer *buffer = flo_getWriteBuffer(bufferType);
+    return flo_appendToBuffer(isatty(buffer->fileDescriptor)
+                                  ? flo_ansiColorToCode[color]
+                                  : FLO_EMPTY_STRING,
+                              buffer, 0);
+}
+uint32_t flo_appendColorReset(flo_BufferType bufferType) {
+    flo_WriteBuffer *buffer = flo_getWriteBuffer(bufferType);
+    return flo_appendToBuffer(isatty(buffer->fileDescriptor)
+                                  ? flo_ansiColorToCode[FLO_COLOR_RESET]
+                                  : FLO_EMPTY_STRING,
+                              buffer, 0);
+}
+
 uint32_t flo_appendUint64ToBufferMinSize(uint64_t data, unsigned char minSize,
                                          flo_WriteBuffer *buffer,
                                          unsigned char flags) {
@@ -134,7 +155,7 @@ uint32_t flo_appendCStr(char *data, flo_WriteBuffer *buffer,
                         unsigned char flags) {
     ptrdiff_t len = strlen(data);
     return flo_appendToBuffer(
-        (flo_String){.len = len, .buf = (unsigned char *)data}, buffer, flags);
+        (flo_String){.buf = (unsigned char *)data, .len = len}, buffer, flags);
 }
 
 uint32_t flo_appendBool(bool data, flo_WriteBuffer *buffer,
@@ -191,4 +212,53 @@ uint32_t flo_appendPtrdiff(ptrdiff_t data, flo_WriteBuffer *buffer,
     return flo_appendToBuffer(FLO_STRING_PTRS(beg, end), buffer, flags);
 }
 
-uint32_t flo_noAppend() { return 0; }
+uint32_t flo_appendDouble(double data, flo_WriteBuffer *buffer,
+                          unsigned char flags) {
+    uint32_t written = 0;
+    uint32_t prec = 1000000; // i.e. 6 decimals
+
+    if (data < 0) {
+        written += flo_appendChar('-', buffer, 0);
+        data = -data;
+    }
+
+    data += 0.5 / ((double)prec);      // round last decimal
+    if (data >= (double)(-1UL >> 1)) { // out of long range?
+        return written + flo_appendToBuffer(FLO_STRING("inf"), buffer, flags);
+    }
+
+    uint64_t integral = (uint64_t)data;
+    uint64_t fractional = (uint64_t)((data - (double)integral) * (double)prec);
+
+    written += flo_appendUint64(integral, buffer, 0);
+    written += flo_appendChar('.', buffer, 0);
+
+    unsigned char counter = 0;
+    for (uint32_t i = prec / 10; i > 1; i /= 10) {
+        if (i > fractional) {
+            counter++;
+        }
+    }
+    written += flo_appendRepeatedCharToBuffer('0', counter, buffer, 0);
+
+    return written + flo_appendUint64(fractional, buffer, flags);
+}
+
+uint32_t flo_appendPtrDiffToBufferMinSize(ptrdiff_t data, unsigned char minSize,
+                                          flo_WriteBuffer *buffer,
+                                          unsigned char flags) {
+    // Watch the flags here.
+    uint32_t written = flo_appendPtrdiff(data, buffer, 0);
+    if (written >= minSize) {
+        flo_appendToBuffer(FLO_EMPTY_STRING, buffer, flags);
+        return written;
+    }
+
+    uint32_t extraSpace = minSize - written;
+    return flo_appendRepeatedCharToBuffer(' ', extraSpace, buffer, flags);
+}
+
+uint32_t flo_noAppend() {
+    FLO_ASSERT(false);
+    return 0;
+}

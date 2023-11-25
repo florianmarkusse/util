@@ -24,6 +24,19 @@ typedef struct {
     ptrdiff_t cap;
 } flo_WriteBuffer;
 
+// When adding a value to this enum, also add the right ansi escape code in
+// log.c
+typedef enum {
+    FLO_COLOR_RED,
+    FLO_COLOR_GREEN,
+    FLO_COLOR_YELLOW,
+    FLO_COLOR_BLUE,
+    FLO_COLOR_MAGENTA,
+    FLO_COLOR_CYAN,
+    FLO_COLOR_RESET,
+    FLO_COLOR_NUMS
+} flo_AnsiColor;
+
 typedef enum { FLO_STDOUT, FLO_STDERR } flo_BufferType;
 
 bool flo_flushBuffer(flo_WriteBuffer *buffer);
@@ -36,27 +49,44 @@ uint32_t flo_appendToBuffer(flo_String data, flo_WriteBuffer *buffer,
 uint32_t flo_appendToBufferMinSize(flo_String data, unsigned char minSize,
                                    flo_WriteBuffer *buffer,
                                    unsigned char flags);
+
 uint32_t flo_appendCStr(char *data, flo_WriteBuffer *buffer,
                         unsigned char flags);
+
 uint32_t flo_appendBool(bool data, flo_WriteBuffer *buffer,
                         unsigned char flags);
+
 uint32_t flo_appendChar(char data, flo_WriteBuffer *buffer,
                         unsigned char flags);
+
 uint32_t flo_appendUint64(uint64_t data, flo_WriteBuffer *buffer,
                           unsigned char flags);
 uint32_t flo_appendUint64ToBufferMinSize(uint64_t data, unsigned char minSize,
                                          flo_WriteBuffer *buffer,
                                          unsigned char flags);
+
+uint32_t flo_appendColor(flo_AnsiColor color, flo_BufferType bufferType);
+uint32_t flo_appendColorReset(flo_BufferType bufferType);
+
 uint32_t flo_appendPtrdiff(ptrdiff_t data, flo_WriteBuffer *buffer,
                            unsigned char flags);
+
+uint32_t flo_appendDouble(double data, flo_WriteBuffer *buffer,
+                          unsigned char flags);
+uint32_t flo_appendPtrDiffToBufferMinSize(ptrdiff_t data, unsigned char minSize,
+                                          flo_WriteBuffer *buffer,
+                                          unsigned char flags);
+
 uint32_t flo_noAppend();
 
 #define FLO_LOG_DATA_COMMON(data, buffer, flags)                               \
     _Generic((data),\
         flo_String:  flo_appendToBuffer, \
         char*:  flo_appendCStr, \
+        unsigned char*:  flo_appendCStr, \
         char:  flo_appendChar, \
         ptrdiff_t: flo_appendPtrdiff,\
+        double: flo_appendDouble,\
         uint64_t: flo_appendUint64,\
         uint32_t: flo_appendUint64,\
         uint16_t: flo_appendUint64,\
@@ -77,7 +107,7 @@ uint32_t flo_noAppend();
 #define FLO_LOG_2(data, bufferType)                                            \
     FLO_LOG_DATA_BUFFER_TYPE(data, bufferType, 0)
 #define FLO_LOG_3(data, bufferType, flags)                                     \
-    FLO_LOG_DATA_BUFFER_TYPE(data, flags, bufferType)
+    FLO_LOG_DATA_BUFFER_TYPE(data, bufferType, flags)
 
 #define FLO_LOG_CHOOSER_IMPL_1(arg1) FLO_LOG_1(arg1)
 #define FLO_LOG_CHOOSER_IMPL_2(arg1, arg2) FLO_LOG_2(arg1, arg2)
