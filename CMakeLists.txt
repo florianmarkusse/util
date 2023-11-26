@@ -19,14 +19,14 @@ if (CMAKE_BUILD_TYPE STREQUAL "Profiling")
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
 endif()
 
-set(LIBRARY_NAME "${PROJECT_NAME}-${CMAKE_BUILD_TYPE}")
+set(FLO_UTIL_LIBRARY "${PROJECT_NAME}-${CMAKE_BUILD_TYPE}")
 
 if(BUILD_SHARED_LIBS)
     set(LIBRARY_TYPE "SHARED")
 else()
     set(LIBRARY_TYPE "STATIC")
 endif()
-add_library(${LIBRARY_NAME} ${LIBRARY_TYPE}
+add_library(${FLO_UTIL_LIBRARY} ${LIBRARY_TYPE}
     "src/file/read.c"
     "src/file/path.c"
     "src/hash/msi/common.c"
@@ -42,13 +42,13 @@ add_library(${LIBRARY_NAME} ${LIBRARY_TYPE}
     "src/log.c"
 )
 
-target_compile_options(${LIBRARY_NAME} PRIVATE
+target_compile_options(${FLO_UTIL_LIBRARY} PRIVATE
     $<$<CONFIG:Debug>:-O0 -g3>
     $<$<CONFIG:Release>:-O3>
     $<$<CONFIG:Profiling>:-O2 -pg>
 )
 
-target_compile_definitions(${LIBRARY_NAME} PRIVATE
+target_compile_definitions(${FLO_UTIL_LIBRARY} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:>
     $<$<CONFIG:Profiling>:>
@@ -57,5 +57,4 @@ target_compile_definitions(${LIBRARY_NAME} PRIVATE
 set(FLO_UTIL_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
-
-target_include_directories(${LIBRARY_NAME} PRIVATE ${FLO_UTIL_INCLUDES})
+target_include_directories(${FLO_UTIL_LIBRARY} PRIVATE ${FLO_UTIL_INCLUDES})
