@@ -11,7 +11,7 @@ extern "C" {
 #define FLO_NULL_ON_FAIL 0x02
 
 #define FLO_SIZEOF(x) (ptrdiff_t)sizeof(x)
-#define FLO_COUNTOF(a) (FLO_SIZEOF(a) / FLO_STRINGIZEOF(*(a)))
+#define FLO_COUNTOF(a) (FLO_SIZEOF(a) / FLO_SIZEOF(*(a)))
 #define FLO_LENGTHOF(s) (FLO_COUNTOF(s) - 1)
 #define FLO_ALIGNOF(t) (_Alignof(t))
 
