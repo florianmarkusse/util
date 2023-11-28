@@ -59,6 +59,9 @@ uint32_t flo_appendBool(bool data, flo_WriteBuffer *buffer,
 uint32_t flo_appendChar(char data, flo_WriteBuffer *buffer,
                         unsigned char flags);
 
+uint32_t flo_appendPtr(void *data, flo_WriteBuffer *buffer,
+                       unsigned char flags);
+
 uint32_t flo_appendUint64(uint64_t data, flo_WriteBuffer *buffer,
                           unsigned char flags);
 uint32_t flo_appendUint64ToBufferMinSize(uint64_t data, unsigned char minSize,
@@ -83,6 +86,7 @@ uint32_t flo_noAppend();
     _Generic((data),\
         flo_String:  flo_appendToBuffer, \
         char*:  flo_appendCStr, \
+        void*: flo_appendPtr,\
         unsigned char*:  flo_appendCStr, \
         char:  flo_appendChar, \
         ptrdiff_t: flo_appendPtrdiff,\
