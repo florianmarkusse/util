@@ -153,6 +153,9 @@ uint32_t flo_appendUint64ToBufferMinSize(uint64_t data, unsigned char minSize,
 
 uint32_t flo_appendCStr(char *data, flo_WriteBuffer *buffer,
                         unsigned char flags) {
+    if (data == NULL) {
+        return 0;
+    }
     ptrdiff_t len = strlen(data);
     return flo_appendToBuffer(
         (flo_String){.buf = (unsigned char *)data, .len = len}, buffer, flags);
