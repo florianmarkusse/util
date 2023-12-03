@@ -97,7 +97,6 @@ uint32_t flo_noAppend();
         uint8_t: flo_appendUint64,\
         int: flo_appendUint64,\
         short: flo_appendUint64,\
-        size_t: flo_appendUint64,\
         bool: flo_appendBool,\
         default: flo_noAppend \
     )(data, buffer, flags)
