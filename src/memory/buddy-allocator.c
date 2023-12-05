@@ -1,4 +1,5 @@
-#include "memory/buddy-allocator.h"
+#include "flo/util/memory/buddy-allocator.h"
+#include "flo/util/assert.h"
 
 flo_BuddyBlock *flo_splitBuddy(flo_BuddyBlock *block, size_t size) {
     FLO_ASSERT(size > 0);

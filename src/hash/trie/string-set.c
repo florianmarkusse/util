@@ -1,4 +1,4 @@
-#include "hash/trie/string-set.h"
+#include "flo/util/hash/trie/string-set.h"
 
 bool flo_trie_insertStringSet(flo_String key, flo_trie_StringSet **set,
                               flo_Arena *perm) {

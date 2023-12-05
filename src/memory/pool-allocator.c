@@ -1,4 +1,5 @@
-#include "memory/pool-allocator.h"
+#include "flo/util/memory/pool-allocator.h"
+#include "flo/util/assert.h"
 
 void flo_freePool(flo_PoolAllocator *pool) {
     size_t chunkCount = pool->cap / pool->chunkSize;

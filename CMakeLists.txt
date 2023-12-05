@@ -58,3 +58,44 @@ set(FLO_UTIL_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
 target_include_directories(${FLO_UTIL_LIBRARY} PRIVATE ${FLO_UTIL_INCLUDES})
+
+# Install the library
+install(TARGETS ${FLO_UTIL_LIBRARY}
+        DESTINATION lib
+        EXPORT ${PROJECT_NAME}Config)
+
+# Install header files
+install(DIRECTORY include/ DESTINATION include)
+
+# Generate a Config.cmake file
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION 1.0.0
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
+# Install the Config.cmake files
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION lib/cmake/${PROJECT_NAME}
+)
+
+# Configure CPack for creating a package
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_VERSION "1.0.0")  # Set your version here
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Utility functions for C")
+set(CPACK_PACKAGE_VENDOR "Florian Markusse")
+set(CPACK_PACKAGE_CONTACT "florianmarkusse@gotmail.com")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(CPACK_GENERATOR "ZIP") 
+
+include(CPack)

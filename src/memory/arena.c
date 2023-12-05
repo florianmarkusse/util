@@ -1,4 +1,5 @@
-#include "memory/arena.h"
+#include "flo/util/memory/arena.h"
+#include "flo/util/assert.h"
 
 __attribute((malloc, alloc_size(2, 4), alloc_align(3))) void *
 flo_alloc(flo_Arena *a, ptrdiff_t size, ptrdiff_t align, ptrdiff_t count,

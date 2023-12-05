@@ -1,6 +1,6 @@
-#include "hash/msi/string-set.h"
+#include "flo/util/hash/msi/string-set.h"
 
-#include "hash/hashes.h"
+#include "flo/util/hash/hashes.h"
 
 bool flo_msi_insertString(flo_String string, size_t hash,
                           flo_msi_String *index) {

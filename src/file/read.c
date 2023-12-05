@@ -2,9 +2,9 @@
 #include <stdlib.h>
 
 #include "error.h"
-#include "file/read.h"
-#include "log.h"
-#include "memory/arena.h"
+#include "flo/util/file/read.h"
+#include "flo/util/log.h"
+#include "flo/util/memory/arena.h"
 
 flo_FileStatus flo_readFile(char *srcPath, flo_String *buffer,
                             flo_Arena *perm) {

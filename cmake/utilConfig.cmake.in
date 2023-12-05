@@ -1,0 +1,6 @@
+# Variables defined in utilConfig.cmake.in
+set(_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+set(_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib")
+set(_LIBRARIES "${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}-${CMAKE_BUILD_TYPE}.a")
+
+# Additional variables can be added based on your project's needs
