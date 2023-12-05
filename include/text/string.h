@@ -106,6 +106,16 @@ flo_firstOccurenceOf(flo_String s, unsigned char ch) {
     return flo_firstOccurenceOfFrom(s, ch, 0);
 }
 
+__attribute__((unused)) static inline ptrdiff_t
+flo_lastOccurenceOf(flo_String s, unsigned char ch) {
+    for (ptrdiff_t i = s.len - 1; i >= 0; i--) {
+        if (s.buf[i] == ch) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 #ifdef __cplusplus
 }
 #endif
